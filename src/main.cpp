@@ -9,6 +9,7 @@
 #include <glm/mat4x4.hpp>
 
 #include <iostream>
+#include <vector>
 
 // Vulkan
 VkInstance instance;
@@ -20,11 +21,6 @@ int main(int argc, char* argv[]) {
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
 	GLFWwindow* window = glfwCreateWindow(800, 600, "Vulkan", nullptr, nullptr);
-
-	uint32_t extensionCount = 0;
-	vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
-
-	std::cout << extensionCount << " extensions supported\n";
 
 	// vk
 	VkApplicationInfo appInfo{};
@@ -51,13 +47,30 @@ int main(int argc, char* argv[]) {
 	if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS)
 	{
 		throw std::runtime_error("failed to create instance!");
-		return EXIT_FAILURE;
 	}
 
+	// VK Extensions
+	uint32_t extensionCount = 0;
+	vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
+	std::cout << extensionCount << " extensions supported\n";
+
+	std::vector<VkExtensionProperties> extensions(extensionCount);
+	vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
+
+	std::cout << "available extensions:\n";
+
+	for (const auto& extension : extensions) {
+		std::cout << '\t' << extension.extensionName << '\n';
+	}
+
+	// MAIN LOOP
 	while (!glfwWindowShouldClose(window))
 	{
 		glfwPollEvents();
 	}
+
+	// Cleanup
+	vkDestroyInstance(instance, nullptr);
 
 	glfwDestroyWindow(window);
 
