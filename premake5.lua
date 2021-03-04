@@ -17,14 +17,19 @@ project "MY_PROJECT_NAME"
 
 	-- DEPENDENCIES
 
-	includedirs { "deps/include" }
+	includedirs { 
+		"deps/include",
+		"C:/VulkanSDK/1.2.170.0/Include"
+	 }
 
 	libdirs {
 		"deps/glfw",
+		"C:/VulkanSDK/1.2.170.0/Lib"
 	}
 
 	links {
-		"glfw3"
+		"glfw3",
+		"vulkan-1"
 	}
 
 	-- add your dlls here to be copied to build folder:
