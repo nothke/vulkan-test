@@ -133,9 +133,8 @@ struct QueueFamilyIndices {
 };
 
 QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device) {
-	QueueFamilyIndices indices{};
+	QueueFamilyIndices indices;
 
-	// Logic to find queue family indices to populate struct with
 	uint32_t queueFamilyCount = 0;
 	vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
 
@@ -145,23 +144,21 @@ QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device) {
 	int i = 0;
 	for (const auto& queueFamily : queueFamilies) {
 		if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-			indices.graphicsFamily = static_cast<uint32_t>(i);
+			indices.graphicsFamily = i;
 		}
 
 		VkBool32 presentSupport = false;
 		vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupport);
-
+		
 		if (presentSupport) {
-			indices.presentFamily = static_cast<uint32_t>(i);
+			indices.presentFamily = i;
 		}
 
-		if (indices.IsComplete()) // Why?
+		if (indices.IsComplete())
 			break;
 
 		i++;
 	}
-
-
 
 	return indices;
 }
@@ -358,11 +355,12 @@ int main(int argc, char* argv[])
 
 	SetupDebugMessenger();
 
+	CreateSurface(window);
+
 	PickPhysicalDevice();
 
 	CreateLogicalDevice();
 
-	CreateSurface(window);
 
 	// MAIN LOOP
 	while (!glfwWindowShouldClose(window))
