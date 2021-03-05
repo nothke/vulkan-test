@@ -116,6 +116,10 @@ void SetupDebugMessenger() {
 
 struct QueueFamilyIndices {
 	std::optional<uint32_t> graphicsFamily;
+
+	bool IsComplete() {
+		return graphicsFamily.has_value();
+	}
 };
 
 QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device) {
@@ -133,6 +137,9 @@ QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device) {
 		if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
 			indices.graphicsFamily = static_cast<uint32_t>(i);
 		}
+
+		if (indices.IsComplete()) // Why?
+			break;
 
 		i++;
 	}
@@ -153,7 +160,7 @@ bool IsDeviceSuitable(VkPhysicalDevice device)
 
 	QueueFamilyIndices indices = FindQueueFamilies(device);
 
-	bool good = goodType && indices.graphicsFamily.has_value();
+	bool good = goodType && indices.IsComplete();
 
 	std::cout << "Device is good? " << good << "\n";
 
