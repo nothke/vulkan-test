@@ -1,7 +1,7 @@
-workspace "MY_PROJECT_NAME"
+workspace "vulkan-test"
    configurations { "Debug", "Release" }
 
-project "MY_PROJECT_NAME"
+project "vulkan-test"
 	kind "ConsoleApp"
 	language "C++"
 	architecture "x64"
