@@ -1,5 +1,8 @@
+#define VK_USE_PLATFORM_WIN32_KHR
 #define GLFW_INCLUDE_VULKAN
-#include "GLFW/glfw3.h"
+#include <GLFW/glfw3.h>
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <GLFW/glfw3native.h>
 
 #include <vulkan/vulkan.h>
 
@@ -24,6 +27,7 @@ VkDebugUtilsMessengerEXT debugMessenger;
 VkPhysicalDevice physicalDevice{ VK_NULL_HANDLE };
 VkDevice device;
 VkQueue graphicsQueue;
+VkSurfaceKHR surface;
 
 const std::vector<const char*> validationLayers = {
 	"VK_LAYER_KHRONOS_validation"
@@ -239,6 +243,23 @@ void CreateLogicalDevice()
 	vkGetDeviceQueue(device, indices.graphicsFamily.value(), 0, &graphicsQueue);
 }
 
+void CreateSurface(GLFWwindow* window)
+{
+	/*
+	VkWin32SurfaceCreateInfoKHR createInfo{};
+	createInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+	createInfo.hwnd = glfwGetWin32Window(window);
+	createInfo.hinstance = GetModuleHandle(nullptr);
+
+	if (vkCreateWin32SurfaceKHR(instance, &createInfo, nullptr, &surface) != VK_SUCCESS) {
+		throw std::runtime_error("failed to create window surface!");
+	}*/
+
+	if (glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS) {
+		throw std::runtime_error("failed to create window surface!");
+	}
+}
+
 int main(int argc, char* argv[])
 {
 	glfwInit();
@@ -310,6 +331,7 @@ int main(int argc, char* argv[])
 
 	CreateLogicalDevice();
 
+	CreateSurface(window);
 
 	// MAIN LOOP
 	while (!glfwWindowShouldClose(window))
@@ -324,6 +346,7 @@ int main(int argc, char* argv[])
 		DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
 	}
 
+	vkDestroySurfaceKHR(instance, surface, nullptr);
 	vkDestroyInstance(instance, nullptr);
 
 	glfwDestroyWindow(window);
