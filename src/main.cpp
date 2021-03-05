@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <vector>
+#include <optional>
 
 #ifdef NDEBUG
 const bool enableValidationLayers = false;
@@ -113,6 +114,32 @@ void SetupDebugMessenger() {
 	}
 }
 
+struct QueueFamilyIndices {
+	std::optional<uint32_t> graphicsFamily;
+};
+
+QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device) {
+	QueueFamilyIndices indices;
+
+	// Logic to find queue family indices to populate struct with
+	uint32_t queueFamilyCount = 0;
+	vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
+
+	std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+	vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
+
+	int i = 0;
+	for (const auto& queueFamily : queueFamilies) {
+		if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+			indices.graphicsFamily = static_cast<uint32_t>(i);
+		}
+
+		i++;
+	}
+
+	return indices;
+}
+
 bool IsDeviceSuitable(VkPhysicalDevice device)
 {
 	VkPhysicalDeviceProperties deviceProperties;
@@ -121,8 +148,16 @@ bool IsDeviceSuitable(VkPhysicalDevice device)
 	VkPhysicalDeviceFeatures deviceFeatures;
 	vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
 
-	return deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU &&
+	bool goodType = deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU &&
 		deviceFeatures.geometryShader;
+
+	QueueFamilyIndices indices = FindQueueFamilies(device);
+
+	bool good = goodType && indices.graphicsFamily.has_value();
+
+	std::cout << "Device is good? " << good << "\n";
+
+	return good;
 }
 
 void PickPhysicalDevice()
