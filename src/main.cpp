@@ -23,6 +23,7 @@ VkInstance instance;
 VkDebugUtilsMessengerEXT debugMessenger;
 VkPhysicalDevice physicalDevice{ VK_NULL_HANDLE };
 VkDevice device;
+VkQueue graphicsQueue;
 
 const std::vector<const char*> validationLayers = {
 	"VK_LAYER_KHRONOS_validation"
@@ -234,6 +235,8 @@ void CreateLogicalDevice()
 	if (vkCreateDevice(physicalDevice, &createInfo, nullptr, &device) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create logical device!");
 	}
+
+	vkGetDeviceQueue(device, indices.graphicsFamily.value(), 0, &graphicsQueue);
 }
 
 int main(int argc, char* argv[])
@@ -306,6 +309,7 @@ int main(int argc, char* argv[])
 	PickPhysicalDevice();
 
 	CreateLogicalDevice();
+
 
 	// MAIN LOOP
 	while (!glfwWindowShouldClose(window))
